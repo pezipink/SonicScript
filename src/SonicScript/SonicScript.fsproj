@@ -12,6 +12,7 @@
     <TargetFrameworkVersion>v4.5.1</TargetFrameworkVersion>
     <TargetFSharpCoreVersion>4.3.1.0</TargetFSharpCoreVersion>
     <Name>SonicScript</Name>
+    <TargetFrameworkProfile />
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
     <DebugSymbols>true</DebugSymbols>
@@ -32,29 +33,6 @@
     <WarningLevel>3</WarningLevel>
     <DocumentationFile>bin\Release\SonicScript.XML</DocumentationFile>
   </PropertyGroup>
-  <ItemGroup>
-    <Reference Include="Jacobi.Vst.Core">
-      <HintPath>..\..\lib\Jacobi.Vst.Core.dll</HintPath>
-    </Reference>
-    <Reference Include="Jacobi.Vst.Framework">
-      <HintPath>..\..\lib\Jacobi.Vst.Framework.dll</HintPath>
-    </Reference>
-    <Reference Include="Jacobi.Vst.Interop">
-      <HintPath>..\..\lib\Jacobi.Vst.Interop.dll</HintPath>
-    </Reference>
-    <Reference Include="mscorlib" />
-    <Reference Include="FSharp.Core, Version=$(TargetFSharpCoreVersion), Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a">
-      <Private>True</Private>
-    </Reference>
-    <Reference Include="System" />
-    <Reference Include="System.Configuration" />
-    <Reference Include="System.Core" />
-    <Reference Include="System.Drawing" />
-    <Reference Include="System.Numerics" />
-  </ItemGroup>
-  <ItemGroup>
-    <Compile Include="Core.fs" />
-  </ItemGroup>
   <PropertyGroup>
     <MinimumVisualStudioVersion Condition="'$(MinimumVisualStudioVersion)' == ''">11</MinimumVisualStudioVersion>
   </PropertyGroup>
@@ -76,6 +54,36 @@
 copy "$(SolutionDir)..\..\lib\Jacobi.Vst.Interop.dll" "$(SolutionDir)..\..\lib\$(TargetName).dll"
 </PostBuildEvent>
   </PropertyGroup>
+  <ItemGroup>
+    <Compile Include="Core.fs" />
+    <None Include="packages.config" />
+    <None Include="app.config" />
+  </ItemGroup>
+  <ItemGroup>
+    <Reference Include="FSharp.Compiler.Service, Version=0.0.78.0, Culture=neutral, PublicKeyToken=c98df1e72ba0e1ef">
+      <HintPath>..\..\..\FSharp.Compiler.Service\bin\v4.5\FSharp.Compiler.Service.dll</HintPath>
+      <SpecificVersion>True</SpecificVersion>
+    </Reference>
+    <Reference Include="Jacobi.Vst.Core">
+      <HintPath>..\..\..\..\VSTNET\x86\Release\Jacobi.Vst.Core.dll</HintPath>
+    </Reference>
+    <Reference Include="Jacobi.Vst.Framework">
+      <HintPath>..\..\..\..\VSTNET\x86\Release\Jacobi.Vst.Framework.dll</HintPath>
+    </Reference>
+    <Reference Include="Jacobi.Vst.Interop">
+      <HintPath>..\..\lib\Jacobi.Vst.Interop.dll</HintPath>
+    </Reference>
+    <Reference Include="mscorlib" />
+    <Reference Include="FSharp.Core, Version=$(TargetFSharpCoreVersion), Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a">
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="System" />
+    <Reference Include="System.Configuration" />
+    <Reference Include="System.Core" />
+    <Reference Include="System.Drawing" />
+    <Reference Include="System.Numerics" />
+    <Reference Include="System.Windows.Forms" />
+  </ItemGroup>
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.
   <Target Name="BeforeBuild">

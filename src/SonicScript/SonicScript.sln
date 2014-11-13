@@ -5,6 +5,8 @@ VisualStudioVersion = 12.0.30723.0
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{F2A71F9B-5D33-465A-A702-920D77279786}") = "SonicScript", "SonicScript.fsproj", "{4594B6D8-9F9D-4B5C-B4FB-D0362ABEA37B}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "WindowsFormsApplication1", "..\WindowsFormsApplication1\WindowsFormsApplication1.csproj", "{0B411CCD-3150-4A4C-8266-1A3BC56F2422}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -15,6 +17,10 @@ Global
 		{4594B6D8-9F9D-4B5C-B4FB-D0362ABEA37B}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{4594B6D8-9F9D-4B5C-B4FB-D0362ABEA37B}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{4594B6D8-9F9D-4B5C-B4FB-D0362ABEA37B}.Release|Any CPU.Build.0 = Release|Any CPU
+		{0B411CCD-3150-4A4C-8266-1A3BC56F2422}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{0B411CCD-3150-4A4C-8266-1A3BC56F2422}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{0B411CCD-3150-4A4C-8266-1A3BC56F2422}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{0B411CCD-3150-4A4C-8266-1A3BC56F2422}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

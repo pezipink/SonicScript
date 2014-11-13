@@ -1,10 +1,149 @@
 ﻿namespace SonicScript
 
+open System.Text
+open System.IO
+open System.Drawing
 open Jacobi.Vst
 open Jacobi.Vst.Core
+open System.Windows.Forms
 open Jacobi.Vst.Core.Plugin
 open Jacobi.Vst.Framework
+open Jacobi.Vst.Framework.Common
 open Jacobi.Vst.Framework.Plugin
+open Microsoft.FSharp.Compiler.Interactive.Shell
+open System.Reflection
+
+type PluginEditorView() as this =
+    inherit UserControl()
+    // Intialize output and input streams
+    let sbOut = new StringBuilder()
+    let sbErr = new StringBuilder()
+    let inStream = new StringReader("")
+    let outStream = new StringWriter(sbOut)
+    let errStream = new StringWriter(sbErr)
+    
+    // Build command line arguments & start FSI session
+    let argv = [| @"C:\Program Files (x86)\Microsoft SDKs\F#\3.1\Framework\v4.0\Fsi.exe" |]
+    let allArgs = Array.append argv [|"--gui-"|]
+   
+//    let fsiConfig =  lazy FsiEvaluationSession.GetDefaultConfiguration()
+//    let fsiSession = lazy FsiEvaluationSession.Create(fsiConfig.Value, allArgs, inStream, outStream, errStream)   
+//   
+    let components = Unchecked.defaultof<_> : System.ComponentModel.IContainer 
+    let btnExecute = new Button()
+    let splitContainer1 = new SplitContainer()
+    let rtfInput = new RichTextBox()    
+    let rtfOutput = new RichTextBox()
+    do
+        (splitContainer1 :> System.ComponentModel.ISupportInitialize).BeginInit()
+        splitContainer1.Panel1.SuspendLayout()
+        splitContainer1.Panel2.SuspendLayout()
+        splitContainer1.SuspendLayout()
+        this.SuspendLayout()
+        // 
+        // splitContainer1
+        // 
+        splitContainer1.Dock <- System.Windows.Forms.DockStyle.Fill
+        splitContainer1.Location <- new System.Drawing.Point(0, 0)
+        splitContainer1.Name <- "splitContainer1"
+        splitContainer1.Orientation <- System.Windows.Forms.Orientation.Horizontal
+        // 
+        // splitContainer1.Panel1
+        // 
+        splitContainer1.Panel1.Controls.Add(rtfInput)
+        splitContainer1.Panel1.Controls.Add(btnExecute)
+        // 
+        // splitContainer1.Panel2
+        // 
+        splitContainer1.Panel2.Controls.Add(rtfOutput)
+        splitContainer1.Size <- new System.Drawing.Size(551, 396)
+        splitContainer1.SplitterDistance <- 250
+        splitContainer1.TabIndex <- 0
+        // 
+        // btnExecute
+        // 
+        btnExecute.Dock <- System.Windows.Forms.DockStyle.Bottom
+        btnExecute.Location <- new System.Drawing.Point(0, 227)
+        btnExecute.Name <- "btnExecute"
+        btnExecute.Size <- new System.Drawing.Size(551, 23)
+        btnExecute.TabIndex <- 0
+        btnExecute.Text <- "button1"
+        btnExecute.UseVisualStyleBackColor <- true
+        // 
+        // rtfInput
+        // 
+        rtfInput.Dock <- System.Windows.Forms.DockStyle.Fill
+        rtfInput.Location <- new System.Drawing.Point(0, 0)
+        rtfInput.Name <- "rtfInput"
+        rtfInput.Size <- new System.Drawing.Size(551, 227)
+        rtfInput.TabIndex <- 1
+        rtfInput.Text <- ""
+        // 
+        // rtfOutput
+        // 
+        rtfOutput.Dock <- System.Windows.Forms.DockStyle.Fill
+        rtfOutput.Location <- new System.Drawing.Point(0, 0)
+        rtfOutput.Name <- "rtfOutput"
+        rtfOutput.Size <- new System.Drawing.Size(551, 142)
+        rtfOutput.TabIndex <- 0
+        rtfOutput.Text <- ""
+        // 
+        // Form1
+        // 
+        this.AutoScaleDimensions <- new System.Drawing.SizeF(6.0F, 13.0F)
+        this.AutoScaleMode <- System.Windows.Forms.AutoScaleMode.Font
+        this.ClientSize <- new System.Drawing.Size(551, 396)
+        this.Controls.Add(splitContainer1)
+        this.Name <- "SonicScript - pinksquirrelabs.com"
+        this.Text <- "SonicScript - pinksquirrelabs.com"
+        splitContainer1.Panel1.ResumeLayout(false)
+        splitContainer1.Panel2.ResumeLayout(false)
+        (splitContainer1 :> System.ComponentModel.ISupportInitialize).EndInit()
+        splitContainer1.ResumeLayout(false)
+        this.ResumeLayout(false)
+
+        btnExecute.Click 
+        |> Observable.subscribe(fun _ -> 
+            
+            let c =   FsiEvaluationSession.GetDefaultConfiguration()
+            
+            let s =  FsiEvaluationSession.Create(c, allArgs, inStream, outStream, errStream)   
+            //fsiSession.Value.EvalInteraction rtfInput.Text 
+            ()
+            ) |> ignore
+        ()
+
+
+
+
+type PluginEditor(plugin) =
+    let view = new WinFormsControlWrapper<PluginEditorView>()
+    let mutable kmode = VstKnobMode.CircularMode
+    interface IVstPluginEditor with
+        member x.Bounds: Rectangle = 
+            view.Bounds
+        
+        member x.Close(): unit = 
+            view.Close()
+        
+        member x.KeyDown(ascii: byte, virtualKey: VstVirtualKey, modifers: VstModifierKeys): bool = 
+            false
+        
+        member x.KeyUp(ascii: byte, virtualKey: VstVirtualKey, modifers: VstModifierKeys): bool = 
+            false
+        
+        member x.KnobMode
+            with get (): VstKnobMode = 
+                kmode
+            and set (v: VstKnobMode): unit = 
+                kmode <- v
+        
+        member x.Open(hWnd: nativeint): unit = 
+            view.Open hWnd
+        
+        member x.ProcessIdle(): unit = 
+            ()
+        
 
 type PluginPrograms(plugin) =
     inherit VstPluginProgramsBase()
@@ -38,7 +177,7 @@ type PluginPrograms(plugin) =
     member this.CreateProgram(parameterInfos:VstParameterInfoCollection) =
         let program = new VstProgram(parameterCategories)
         this.CreateParameters(program.Parameters, parameterInfos)
-        program;
+        program
 
     // create all parameters
     member this.CreateParameters(desitnation:VstParameterCollection , parameterInfos:VstParameterInfoCollection ) =
@@ -55,16 +194,16 @@ type Distortion(plugin:SonicScriptPlugin) =
 
     let tapMgr =
         let paramInfo = VstParameterInfo()
-        paramInfo.Name <- "Tap";
-        paramInfo.Label <- "Tap";
-        paramInfo.ShortLabel <- "|";
-        paramInfo.MinInteger <- 0;
-        paramInfo.MaxInteger <- 2;
-        paramInfo.LargeStepFloat <- 1.0f;
-        paramInfo.SmallStepFloat <- 1.0f;
-        paramInfo.StepFloat <- 1.0f;
-        paramInfo.CanRamp <- true;
-        paramInfo.DefaultValue <- 0.0f;
+        paramInfo.Name <- "Tap"
+        paramInfo.Label <- "Tap"
+        paramInfo.ShortLabel <- "|"
+        paramInfo.MinInteger <- 0
+        paramInfo.MaxInteger <- 2
+        paramInfo.LargeStepFloat <- 1.0f
+        paramInfo.SmallStepFloat <- 1.0f
+        paramInfo.StepFloat <- 1.0f
+        paramInfo.CanRamp <- true
+        paramInfo.DefaultValue <- 0.0f
         let prog = plugin.PluginPrograms() : PluginPrograms
         prog.AddParamInfo(paramInfo)
         let m = VstParameterManager paramInfo
@@ -149,6 +288,12 @@ and SonicScriptPlugin() =
         | null -> PluginPrograms(this) :> _
         | instance -> base.CreatePrograms(instance)
 
+
+    override this.CreateEditor instance =
+        match instance with
+        | null -> PluginEditor(this) :> _
+        | instance -> base.CreateEditor instance
+
     member this.PluginPrograms() = this.GetInstance<PluginPrograms>() : PluginPrograms
     
 
@@ -163,9 +308,31 @@ and SonicScriptPlugin() =
 
 type SonicScriptPluginCommandStub() =
     inherit StdPluginCommandStub()
-
+//
+//    
+//    let handler = System.ResolveEventHandler(fun _ args ->
+//        let asmName = AssemblyName(args.Name)
+//        // assuming that we reference only dll files
+//        let expectedName = asmName.Name + ".dll"
+//        let expectedLocation =
+//            System.IO.Path.Combine(@"f:\utils\vstplugins\", expectedName)
+//        if System.IO.File.Exists expectedLocation then Assembly.LoadFrom expectedLocation else null
+//        )
+//    do System.AppDomain.CurrentDomain.add_AssemblyResolve handler
     override __.CreatePluginInstance() = 
-   //     System.Diagnostics.Debugger.Break()
+        System.Diagnostics.Debugger.Break()
+        let sbOut = new StringBuilder()
+        let sbErr = new StringBuilder()
+        let inStream = new StringReader("")
+        let outStream = new StringWriter(sbOut)
+        let errStream = new StringWriter(sbErr)
+    
+        // Build command line arguments & start FSI session
+        let argv = [| "C:\\fsi.exe" |]
+        let allArgs = Array.append argv [|"--noninteractive"|]
+        //let c =   FsiEvaluationSession.GetDefaultConfiguration()
+//        let s =  FsiEvaluationSession.Create(c, allArgs, inStream, outStream, errStream)   
+//   
         new SonicScriptPlugin() :> _
 
     
