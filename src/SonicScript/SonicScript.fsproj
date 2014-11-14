@@ -60,9 +60,9 @@ copy "$(SolutionDir)..\..\lib\Jacobi.Vst.Interop.dll" "$(SolutionDir)..\..\lib\$
     <None Include="app.config" />
   </ItemGroup>
   <ItemGroup>
-    <Reference Include="FSharp.Compiler.Service, Version=0.0.78.0, Culture=neutral, PublicKeyToken=c98df1e72ba0e1ef">
-      <HintPath>..\..\..\FSharp.Compiler.Service\bin\v4.5\FSharp.Compiler.Service.dll</HintPath>
-      <SpecificVersion>True</SpecificVersion>
+    <Reference Include="FSharp.Compiler.Service">
+      <HintPath>packages\FSharp.Compiler.Service.0.0.76\lib\net45\FSharp.Compiler.Service.dll</HintPath>
+      <Private>True</Private>
     </Reference>
     <Reference Include="Jacobi.Vst.Core">
       <HintPath>..\..\..\..\VSTNET\x86\Release\Jacobi.Vst.Core.dll</HintPath>
@@ -71,7 +71,7 @@ copy "$(SolutionDir)..\..\lib\Jacobi.Vst.Interop.dll" "$(SolutionDir)..\..\lib\$
       <HintPath>..\..\..\..\VSTNET\x86\Release\Jacobi.Vst.Framework.dll</HintPath>
     </Reference>
     <Reference Include="Jacobi.Vst.Interop">
-      <HintPath>..\..\lib\Jacobi.Vst.Interop.dll</HintPath>
+      <HintPath>..\..\..\..\..\..\Program Files (x86)\vsthost\tesdt\Jacobi.Vst.Interop.dll</HintPath>
     </Reference>
     <Reference Include="mscorlib" />
     <Reference Include="FSharp.Core, Version=$(TargetFSharpCoreVersion), Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a">

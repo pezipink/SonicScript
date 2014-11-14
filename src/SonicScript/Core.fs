@@ -16,19 +16,7 @@ open System.Reflection
 type PluginEditorView() as this =
     inherit UserControl()
     // Intialize output and input streams
-    let sbOut = new StringBuilder()
-    let sbErr = new StringBuilder()
-    let inStream = new StringReader("")
-    let outStream = new StringWriter(sbOut)
-    let errStream = new StringWriter(sbErr)
     
-    // Build command line arguments & start FSI session
-    let argv = [| @"C:\Program Files (x86)\Microsoft SDKs\F#\3.1\Framework\v4.0\Fsi.exe" |]
-    let allArgs = Array.append argv [|"--gui-"|]
-   
-//    let fsiConfig =  lazy FsiEvaluationSession.GetDefaultConfiguration()
-//    let fsiSession = lazy FsiEvaluationSession.Create(fsiConfig.Value, allArgs, inStream, outStream, errStream)   
-//   
     let components = Unchecked.defaultof<_> : System.ComponentModel.IContainer 
     let btnExecute = new Button()
     let splitContainer1 = new SplitContainer()
@@ -105,10 +93,10 @@ type PluginEditorView() as this =
         btnExecute.Click 
         |> Observable.subscribe(fun _ -> 
             
-            let c =   FsiEvaluationSession.GetDefaultConfiguration()
-            
-            let s =  FsiEvaluationSession.Create(c, allArgs, inStream, outStream, errStream)   
-            //fsiSession.Value.EvalInteraction rtfInput.Text 
+//            let c =   FsiEvaluationSession.GetDefaultConfiguration()
+//            
+//            let s =  FsiEvaluationSession.Create(c, allArgs, inStream, outStream, errStream)   
+//            s.EvalInteraction rtfInput.Text 
             ()
             ) |> ignore
         ()
@@ -225,18 +213,19 @@ type Distortion(plugin:SonicScriptPlugin) =
 
 and SonicScriptProcessor(plugin:SonicScriptPlugin) =
     let mutable blocksize = 0
+    let sbOut = new StringBuilder()
+    let sbErr = new StringBuilder()
+    let inStream = new StringReader("")
+    let outStream = new StringWriter(sbOut)
+    let errStream = new StringWriter(sbErr)
     
-    let mutable sample = 0.0f
-    let mutable center_freq = 0
-    let mutable counter = 0
-    let mutable counter_limit = 0
-    let mutable control = 0 // LFO
-    let mutable max_freq = 0
-    let mutable min_freq = 0
-    let mutable pha_mix = 0
-    let mutable f_step = 0
-    let mutable dir_mix = 0
-    let ph_stages = 0
+    // Build command line arguments & start FSI session
+    let argv = [| @"C:\Fsi.exe" |]
+    let allArgs = Array.append argv [|"--noninteractive"|]
+   
+    let fsiConfig =  FsiEvaluationSession.GetDefaultConfiguration()
+    let fsiSession = FsiEvaluationSession.Create(fsiConfig, allArgs, inStream, outStream, errStream)   
+//   
 
     let distortion = Distortion(plugin)
 
@@ -276,7 +265,7 @@ and SonicScriptProcessor(plugin:SonicScriptPlugin) =
         
         
 and SonicScriptPlugin() =
-    inherit VstPluginWithInterfaceManagerBase("SonicScript",VstProductInfo("SonicScript","Ross McKinlay - pinksquirrellabs.com",1), VstPluginCategory.Shell, VstPluginCapabilities.NoSoundInStop, 0, 42424242)
+    inherit VstPluginWithInterfaceManagerBase("SonicScript",VstProductInfo("SonicScript","Ross McKinlay - pinksquirrellabs.com",1), VstPluginCategory.Effect, VstPluginCapabilities.NoSoundInStop, 0, 42424242)
     let mutable bypass = false
     override this.CreateAudioProcessor(instance) = 
         match instance with
@@ -310,26 +299,27 @@ type SonicScriptPluginCommandStub() =
     inherit StdPluginCommandStub()
 //
 //    
-//    let handler = System.ResolveEventHandler(fun _ args ->
-//        let asmName = AssemblyName(args.Name)
-//        // assuming that we reference only dll files
-//        let expectedName = asmName.Name + ".dll"
-//        let expectedLocation =
-//            System.IO.Path.Combine(@"f:\utils\vstplugins\", expectedName)
-//        if System.IO.File.Exists expectedLocation then Assembly.LoadFrom expectedLocation else null
-//        )
-//    do System.AppDomain.CurrentDomain.add_AssemblyResolve handler
+    let handler = System.ResolveEventHandler(fun _ args ->
+        let asmName = AssemblyName(args.Name)
+        // assuming that we reference only dll files
+        let expectedName = asmName.Name + ".dll"
+        let expectedLocation =  
+            if asmName.Name.StartsWith("FSharp.Core") then System.IO.Path.Combine(@"C:\Program Files (x86)\Reference Assemblies\Microsoft\FSharp\.NETFramework\v4.0\4.3.1.0\", expectedName)
+            else System.IO.Path.Combine(@"C:\Users\ross\Documents\SonicScript\src\SonicScript\packages\FSharp.Compiler.Service.0.0.76\lib\net45\", expectedName)
+        if System.IO.File.Exists expectedLocation then Assembly.LoadFrom expectedLocation else null
+        )
+    do System.AppDomain.CurrentDomain.add_AssemblyResolve handler
     override __.CreatePluginInstance() = 
-        System.Diagnostics.Debugger.Break()
-        let sbOut = new StringBuilder()
-        let sbErr = new StringBuilder()
-        let inStream = new StringReader("")
-        let outStream = new StringWriter(sbOut)
-        let errStream = new StringWriter(sbErr)
+        System.Diagnostics.Debugger.Launch()
+//        let sbOut = new StringBuilder()
+//        let sbErr = new StringBuilder()
+//        let inStream = new StringReader("")
+//        let outStream = new StringWriter(sbOut)
+//        let errStream = new StringWriter(sbErr)
     
         // Build command line arguments & start FSI session
-        let argv = [| "C:\\fsi.exe" |]
-        let allArgs = Array.append argv [|"--noninteractive"|]
+//        let argv = [| "C:\\fsi.exe" |]
+//        let allArgs = Array.append argv [|"--noninteractive"|]
         //let c =   FsiEvaluationSession.GetDefaultConfiguration()
 //        let s =  FsiEvaluationSession.Create(c, allArgs, inStream, outStream, errStream)   
 //   
